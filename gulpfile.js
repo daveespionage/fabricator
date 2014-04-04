@@ -88,9 +88,18 @@ gulp.task("scripts", ["scripts:fabricator", "scripts:toolkit"]);
 gulp.task("images", function () {
 	return gulp.src("src/toolkit/assets/img/**/*")
 		.pipe(imagemin())
-		.pipe(gulp.dest("dist/toolkit/img")
-		.pipe(gulpif(!gutil.env.production, connect.reload())));
+		.pipe(gulp.dest("dist/toolkit/img"))
+		.pipe(gulpif(!gutil.env.production, connect.reload()));
 });
+
+// copy static assets
+gulp.task("static", function(){
+	return gulp.src("src/toolkit/assets/{fonts,media}/**/*")
+			.pipe(plumber())
+			.pipe(gulp.dest("dist/toolkit"))
+			.pipe(gulpif(!gutil.env.production, connect.reload()));
+});
+
 
 
 // collate
@@ -144,13 +153,14 @@ gulp.task("watch", ["connect"], function () {
 	gulp.watch("src/toolkit/assets/scss/**/*.scss", ["styles:toolkit"]);
 	gulp.watch("src/fabricator/js/**/*.js", ["scripts:fabricator"]);
 	gulp.watch("src/toolkit/assets/js/**/*.js", ["scripts:toolkit"]);
+	gulp.watch("src/toolkit/assets/{fonts,media}/**/*", ["static"]);
 
 });
 
 
 // build
 gulp.task("build", ["clean"], function () {
-	gulp.start("styles", "scripts", "images", "template");
+	gulp.start("styles", "scripts", "images", "static", "template");
 });
 
 
